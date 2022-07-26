@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package chat;
+
+message SimpleText { 
+    string text = 1;
+}
+
+message NoParam {
+}
+
+service SimpleService {
+    rpc simpleCommunication(NoParam) returns (SimpleText);
+    rpc streamFromServer(NoParam) returns (stream SimpleText);
+}
+
+
