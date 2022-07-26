@@ -1,20 +1,20 @@
 const grpc = require("grpc");
-const protoLoader = require("@grpc/proto-loader"); // compile edilen protobuffer dosyalarını otomatik yüklemek için
+const protoLoader = require("@grpc/proto-loader");
 
-const packageDefinition = protoLoader.loadSync("chat.proto", {}); // protoloader üstünden paket tanımını yükle
-const grpcObject = grpc.loadPackageDefinition(packageDefinition); // paket tanımını yükleyip objeyi elde et
-const { chat } = grpcObject; // grpc objesi üstünden pakedi al.
+const packageDefinition = protoLoader.loadSync("chat.proto", {});
+const grpcObject = grpc.loadPackageDefinition(packageDefinition);
+const { chat } = grpcObject;
 
-// şimdiye kadarki kurulum kısmı client için aynı: kullanacağımız proto dosyasını protoloader üzerinden elde edeceğiz yine. fakat şimdi biz server kurmayacağız; bunun yerine servera bağlanacağız.
+// same until now
 
-// clientı bağlamak için paketimizin servisi üstünden yeni bir obje oluştururuz.
+// in order to connect the client, instantiate a new object using the service provided
 
 const client = new chat.SimpleService(
   "localhost:3001",
   grpc.credentials.createInsecure()
-); // server credential değil, client credential üstünden
+); // NOT server credential but client credential
 
-// artık client üstünden metotlarımızı çağırabiliriz:
+// now free to call methods:
 
 client.simpleCommunication(null, (err, response) => {
   if (err) {
@@ -23,6 +23,9 @@ client.simpleCommunication(null, (err, response) => {
 
   console.log("Received from server " + JSON.stringify(response));
 });
+
+/* call returns the whole TCP connection. call.on("data") means every time a data is transferred from the server
+ stream. */
 
 const call = client.streamFromServer();
 call.on("data", (item) => {
